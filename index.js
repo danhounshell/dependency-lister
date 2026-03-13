@@ -103,7 +103,7 @@ async function getDependenciesFromAllRepos() {
 
     allPackageJsonResults.forEach(result => {
       const { orgName, repoName, packageJson } = result;
-      const fullRepoName = `@${orgName}/${repoName}`;
+      const fullRepoName = `@${orgName.toLowerCase()}/${repoName}`;
 
       // Process both dependencies and devDependencies
       const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
