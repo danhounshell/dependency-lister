@@ -21,15 +21,15 @@ Outputs `dependencies.json` file with a format like:
   ... other dependencies
   "lodash": {
     "4.17.23": [
-      "@yourOrg/repo1",
-      "@yourOrg/repo5"
+      "@yourorg/repo1",
+      "@yourorg/repo5"
     ],
     "4.17.21": [
-      "@yourOrg/repo2",
-      "@yourOrg/repo4"
+      "@yourorg/repo2",
+      "@yourorg/repo4"
     ],
     "4.17.4": [
-      "@yourOrg/repo3"
+      "@yourorg/repo3"
     ]
   }
   ... other dependencies
