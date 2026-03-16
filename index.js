@@ -1,6 +1,8 @@
 
 const { Octokit } = require("@octokit/rest");
 const config = require("./config");
+const https = require("https");
+const semver = require("semver");
 
 const { 
   orgNames: ORG_NAMES,
@@ -9,12 +11,69 @@ const {
   includePublic: INCLUDE_PUBLIC,
   includePrivate: INCLUDE_PRIVATE,
   includeArchived: INCLUDE_ARCHIVED,
-  includeInternal: INCLUDE_INTERNAL
+  includeInternal: INCLUDE_INTERNAL, 
+  includeLatestPackageVersions: INCLUDE_LATEST_PACKAGE_VERSIONS
 } = config;
 
 const octokit = new Octokit({
   auth: GITHUB_TOKEN,
 });
+
+function fetchFromNpmRegistry(packageName) {
+  return new Promise((resolve, reject) => {
+    const encodedName = packageName.startsWith("@")
+      ? `@${encodeURIComponent(packageName.slice(1))}`
+      : encodeURIComponent(packageName);
+    const url = `https://registry.npmjs.org/${encodedName}`;
+
+    https
+      .get(url, response => {
+        let body = "";
+        response.setEncoding("utf8");
+
+        response.on("data", chunk => {
+          body += chunk;
+        });
+
+        response.on("end", () => {
+          if (response.statusCode !== 200) {
+            reject(new Error(`Registry request failed with status ${response.statusCode}`));
+            return;
+          }
+          try {
+            resolve(JSON.parse(body));
+          } catch (error) {
+            reject(new Error(`Failed to parse registry response: ${error.message}`));
+          }
+        });
+      })
+      .on("error", error => reject(error));
+  });
+}
+
+async function getLatestVersionsByMajor(depName, usageVersions) {
+  let candidateVersions = [];
+
+  try {
+    const metadata = await fetchFromNpmRegistry(depName);
+    candidateVersions = Object.keys(metadata.versions || {});
+  } catch (error) {
+    // Fallback to discovered usage versions when registry metadata is unavailable.
+    candidateVersions = usageVersions;
+  }
+
+  const validVersions = candidateVersions.filter(version => semver.valid(version));
+  const latestByMajor = {};
+
+  validVersions.forEach(version => {
+    const major = semver.major(version);
+    if (!latestByMajor[major] || semver.gt(version, latestByMajor[major])) {
+      latestByMajor[major] = version;
+    }
+  });
+
+  return Object.values(latestByMajor).sort(semver.rcompare);
+}
 
 async function fetchOrgRepos(orgName) {
   console.log(`\nFetching repositories for organization: ${orgName}...`);
@@ -122,33 +181,34 @@ async function getDependenciesFromAllRepos() {
       }
     });
 
-    // compare semantic versions
-    function compareSemver(a, b) {
-      const aParts = a.split('.').map(x => parseInt(x, 10) || 0);
-      const bParts = b.split('.').map(x => parseInt(x, 10) || 0);
+    const dependencyNames = Object.keys(allDependencies).sort();
 
-      for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-        const aPart = aParts[i] || 0;
-        const bPart = bParts[i] || 0;
-        if (aPart !== bPart) {
-          return bPart - aPart; // Descending order (newest first)
-        }
-      }
-      return 0;
-    }
-
-    // Sort dependencies alphabetically and versions from newest to oldest
+    // Build output with latest version per major and sorted usage map.
     const sortedDependencies = {};
-    Object.keys(allDependencies)
-      .sort()
-      .forEach(depName => {
-        sortedDependencies[depName] = {};
-        Object.keys(allDependencies[depName])
-          .sort(compareSemver)
-          .forEach(version => {
-            sortedDependencies[depName][version] = allDependencies[depName][version].sort();
-          });
-      });
+    for (const depName of dependencyNames) {
+      const usageVersions = Object.keys(allDependencies[depName]);
+      let latestVersions = [];
+      if ( INCLUDE_LATEST_PACKAGE_VERSIONS ) {
+        latestVersions = await getLatestVersionsByMajor(depName, usageVersions);
+      }
+
+      const usage = {};
+      usageVersions
+        .sort((a, b) => {
+          if (semver.valid(a) && semver.valid(b)) {
+            return semver.rcompare(a, b);
+          }
+          return b.localeCompare(a);
+        })
+        .forEach(version => {
+          usage[version] = allDependencies[depName][version].sort();
+        });
+
+      sortedDependencies[depName] = {
+        latestVersions,
+        usage,
+      };
+    }
 
     // Save to JSON file
     fs.writeFileSync('dependencies.json', JSON.stringify(sortedDependencies, null, 2));

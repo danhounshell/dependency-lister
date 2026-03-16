@@ -20,17 +20,24 @@ Outputs `dependencies.json` file with a format like:
 {
   ... other dependencies
   "lodash": {
-    "4.17.23": [
-      "@yourorg/repo1",
-      "@yourorg/repo5"
+    "latestVersions": [
+      "4.17.23",
+      "3.10.1",
+      "2.4.2"
     ],
-    "4.17.21": [
-      "@yourorg/repo2",
-      "@yourorg/repo4"
-    ],
-    "4.17.4": [
-      "@yourorg/repo3"
-    ]
+    "usage": {
+      "4.17.23": [
+        "@yourOrg/repo1",
+        "@yourOrg/repo5"
+      ],
+      "4.17.21": [
+        "@yourOrg/repo2",
+        "@yourOrg/repo4"
+      ],
+      "4.17.4": [
+        "@yourOrg/repo3"
+      ]
+    }
   }
   ... other dependencies
 }

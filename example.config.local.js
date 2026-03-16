@@ -1,3 +1,5 @@
+const { includeLatestPackageVersions } = require("./config");
+
 module.exports = {
 	orgNames: [ "Your Primary Organization", "Another Organization" ],
 	githubToken: "your token goes here",
@@ -9,5 +11,6 @@ module.exports = {
 	includePublic: true,
 	includePrivate: true,
 	includeArchived: false,
-	includeInternal: false
+	includeInternal: false, 
+	includeLatestPackageVersions: true
 }

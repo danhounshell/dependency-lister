@@ -1,3 +1,5 @@
+const { inc } = require("semver");
+
 module.exports = {
 	name: "dependency-manager",
 	orgNames: [],
@@ -6,5 +8,6 @@ module.exports = {
 	includePublic: true,
 	includePrivate: true,
 	includeArchived: false,
-	includeInternal: false
+	includeInternal: false, 
+	includeLatestPackageVersions: false
 }
