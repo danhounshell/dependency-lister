@@ -3,6 +3,7 @@ Can filter repos to public, private or both
 Can exlude archived or internal repos
 
 example config.local.json
+
 ```
 {
 	"orgNames": [ "YourOrg" ],
@@ -15,7 +16,8 @@ example config.local.json
 }
 ```
 
-Outputs `dependencies.json` file with a format like: 
+Outputs `dependencies.json` file with a format like:
+
 ```
 {
   ... other dependencies

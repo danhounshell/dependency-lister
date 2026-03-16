@@ -5,7 +5,10 @@ const proxyquire = require("proxyquire").noCallThru();
 chai.should();
 
 describe("services/dependencyAggregation", () => {
-  function createService(configOverride = {}, latestStub = sinon.stub().resolves(["2.0.0", "1.9.9"])) {
+  function createService(
+    configOverride = {},
+    latestStub = sinon.stub().resolves(["2.0.0", "1.9.9"])
+  ) {
     const createNpmRegistryService = sinon.stub().returns({
       getLatestVersionsByMajor: latestStub,
     });

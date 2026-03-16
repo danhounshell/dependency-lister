@@ -37,7 +37,9 @@ describe("services/githubPackages", () => {
 
     result.should.deep.equal([]);
     octokit.paginate.called.should.equal(false);
-    consoleLogStub.calledWith("No repository types selected (public/private). Skipping organization.").should.equal(true);
+    consoleLogStub
+      .calledWith("No repository types selected (public/private). Skipping organization.")
+      .should.equal(true);
   });
 
   it("filters repos and returns parsed package json data", async () => {
@@ -69,7 +71,9 @@ describe("services/githubPackages", () => {
       .withArgs({ owner: "OrgA", repo: "repo-good", path: "package.json" })
       .resolves({
         data: {
-          content: Buffer.from(JSON.stringify({ dependencies: { chai: "^4.5.0" } })).toString("base64"),
+          content: Buffer.from(JSON.stringify({ dependencies: { chai: "^4.5.0" } })).toString(
+            "base64"
+          ),
         },
       });
 

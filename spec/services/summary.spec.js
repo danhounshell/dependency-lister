@@ -39,6 +39,8 @@ describe("services/summary", () => {
     consoleLogStub.calledWith("\nTop 10 most used dependencies:").should.equal(true);
     consoleLogStub.calledWith("  1. dep-a: 4 repos, 2 version(s)").should.equal(true);
     consoleLogStub.calledWith("  2. dep-b: 2 repos, 1 version(s)").should.equal(true);
-    dependencyAggregationService.getTopDependencyStats.calledOnceWithExactly({ dep: {} }, 10).should.equal(true);
+    dependencyAggregationService.getTopDependencyStats
+      .calledOnceWithExactly({ dep: {} }, 10)
+      .should.equal(true);
   });
 });

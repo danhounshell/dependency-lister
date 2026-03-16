@@ -65,7 +65,12 @@ describe("services/npmRegistry", () => {
     const httpMock = createHttpGetThatResponds(500, "{}");
     const service = buildServiceWithHttp(httpMock.get);
 
-    const result = await service.getLatestVersionsByMajor("dep", ["1.0.0", "1.3.0", "2.0.1", "invalid"]);
+    const result = await service.getLatestVersionsByMajor("dep", [
+      "1.0.0",
+      "1.3.0",
+      "2.0.1",
+      "invalid",
+    ]);
 
     result.should.deep.equal(["2.0.1", "1.3.0"]);
   });
@@ -108,7 +113,10 @@ describe("services/npmRegistry", () => {
   });
 
   it("returns empty latest versions when metadata has no versions field", async () => {
-    const httpMock = createHttpGetThatResponds(200, JSON.stringify({ distTags: { latest: "1.0.0" } }));
+    const httpMock = createHttpGetThatResponds(
+      200,
+      JSON.stringify({ distTags: { latest: "1.0.0" } })
+    );
     const service = buildServiceWithHttp(httpMock.get);
 
     const result = await service.getLatestVersionsByMajor("dep", ["0.1.0"]);

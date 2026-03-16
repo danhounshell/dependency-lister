@@ -10,11 +10,11 @@ module.exports = function createNpmRegistryService() {
       const url = `https://registry.npmjs.org/${encodedName}`;
 
       https
-        .get(url, response => {
+        .get(url, (response) => {
           let body = "";
           response.setEncoding("utf8");
 
-          response.on("data", chunk => {
+          response.on("data", (chunk) => {
             body += chunk;
           });
 
@@ -31,7 +31,7 @@ module.exports = function createNpmRegistryService() {
             }
           });
         })
-        .on("error", error => reject(error));
+        .on("error", (error) => reject(error));
     });
   }
 
@@ -41,15 +41,15 @@ module.exports = function createNpmRegistryService() {
     try {
       const metadata = await fetchFromNpmRegistry(depName);
       candidateVersions = Object.keys(metadata.versions || {});
-    } catch (error) {
+    } catch {
       // Fall back to discovered usage versions when registry metadata is unavailable.
       candidateVersions = usageVersions;
     }
 
-    const validVersions = candidateVersions.filter(version => semver.valid(version));
+    const validVersions = candidateVersions.filter((version) => semver.valid(version));
     const latestByMajor = {};
 
-    validVersions.forEach(version => {
+    validVersions.forEach((version) => {
       const major = semver.major(version);
       if (!latestByMajor[major] || semver.gt(version, latestByMajor[major])) {
         latestByMajor[major] = version;

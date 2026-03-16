@@ -11,7 +11,7 @@ module.exports = function createDependencyAggregationService(config) {
   function aggregateDependencyUsage(packageJsonResults) {
     const allDependencies = {};
 
-    packageJsonResults.forEach(result => {
+    packageJsonResults.forEach((result) => {
       const { orgName, repoName, packageJson } = result;
       const fullRepoName = `@${orgName.toLowerCase()}/${repoName}`;
       const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
@@ -51,11 +51,9 @@ module.exports = function createDependencyAggregationService(config) {
         : [];
 
       const usage = {};
-      usageVersions
-        .sort(compareUsageVersions)
-        .forEach(version => {
-          usage[version] = allDependencies[depName][version].sort();
-        });
+      usageVersions.sort(compareUsageVersions).forEach((version) => {
+        usage[version] = allDependencies[depName][version].sort();
+      });
 
       sortedDependencies[depName] = {
         latestVersions,

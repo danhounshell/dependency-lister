@@ -78,7 +78,11 @@ describe("index", () => {
 
     await mod.run();
 
-    consoleLogStub.calledWith("No organization names provided in config. Please add org names to the config file.").should.equal(true);
+    consoleLogStub
+      .calledWith(
+        "No organization names provided in config. Please add org names to the config file."
+      )
+      .should.equal(true);
     stubs.Octokit.called.should.equal(false);
   });
 
@@ -87,7 +91,11 @@ describe("index", () => {
 
     await mod.run();
 
-    consoleLogStub.calledWith("No GitHub token provided in config. Please add a GitHub token to the config file.").should.equal(true);
+    consoleLogStub
+      .calledWith(
+        "No GitHub token provided in config. Please add a GitHub token to the config file."
+      )
+      .should.equal(true);
     stubs.Octokit.called.should.equal(false);
   });
 
@@ -96,11 +104,14 @@ describe("index", () => {
     const allDependencies = { dep: { "1.0.0": ["@orga/repo"] } };
     const output = { dep: { latestVersions: ["1.0.0"], usage: { "1.0.0": ["@orga/repo"] } } };
 
-    const { mod, config, stubs, octokitInstance } = loadIndexWithStubs({}, {
-      fetchAllPackageJsons: sinon.stub().resolves(allPackageJsonResults),
-      aggregateDependencyUsage: sinon.stub().returns(allDependencies),
-      buildDependencyOutput: sinon.stub().resolves(output),
-    });
+    const { mod, config, stubs, octokitInstance } = loadIndexWithStubs(
+      {},
+      {
+        fetchAllPackageJsons: sinon.stub().resolves(allPackageJsonResults),
+        aggregateDependencyUsage: sinon.stub().returns(allDependencies),
+        buildDependencyOutput: sinon.stub().resolves(output),
+      }
+    );
 
     await mod.run();
 
@@ -112,13 +123,18 @@ describe("index", () => {
     stubs.writeFileSync.calledOnce.should.equal(true);
     stubs.writeFileSync.firstCall.args[0].should.equal("dependencies.json");
     stubs.writeFileSync.firstCall.args[1].should.equal(JSON.stringify(output, null, 2));
-    stubs.printSummary.calledOnceWithExactly(allPackageJsonResults.length, 1, allDependencies).should.equal(true);
+    stubs.printSummary
+      .calledOnceWithExactly(allPackageJsonResults.length, 1, allDependencies)
+      .should.equal(true);
   });
 
   it("logs error when processing throws", async () => {
-    const { mod } = loadIndexWithStubs({}, {
-      fetchAllPackageJsons: sinon.stub().rejects(new Error("boom")),
-    });
+    const { mod } = loadIndexWithStubs(
+      {},
+      {
+        fetchAllPackageJsons: sinon.stub().rejects(new Error("boom")),
+      }
+    );
 
     await mod.run();
 
@@ -135,10 +151,7 @@ describe("index", () => {
       fs.renameSync(localConfigPath, backupPath);
     }
 
-    fs.writeFileSync(
-      localConfigPath,
-      JSON.stringify({ orgNames: [], githubToken: "" }, null, 2)
-    );
+    fs.writeFileSync(localConfigPath, JSON.stringify({ orgNames: [], githubToken: "" }, null, 2));
 
     try {
       const result = spawnSync(process.execPath, ["index.js"], {
@@ -147,7 +160,11 @@ describe("index", () => {
       });
 
       result.status.should.equal(0);
-      result.stdout.includes("No organization names provided in config. Please add org names to the config file.").should.equal(true);
+      result.stdout
+        .includes(
+          "No organization names provided in config. Please add org names to the config file."
+        )
+        .should.equal(true);
     } finally {
       fs.unlinkSync(localConfigPath);
       if (fs.existsSync(backupPath)) {
