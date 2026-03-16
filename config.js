@@ -6,7 +6,7 @@ function mergeConfig( path ) {
 	try {
 		const otherConfig = require( path ); // eslint-disable-line global-require
 		config = { ...config, ...otherConfig};
-	} catch ( e ) {} // eslint-disable-line no-empty
+	} /* c8 ignore next */ catch ( e ) {} // eslint-disable-line no-empty
 }
 
 mergeConfig( "./config.local" );
