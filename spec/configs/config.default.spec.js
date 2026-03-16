@@ -7,8 +7,9 @@ describe("configs/config.default", () => {
     const configDefault = require("../../configs/config.default");
 
     configDefault.should.include({
-      name: "dependency-manager",
+      name: "dependency-lister",
       githubToken: "",
+      outputPath: "dependencies.json",
       includePublic: true,
       includePrivate: true,
       includeArchived: false,
@@ -16,6 +17,6 @@ describe("configs/config.default", () => {
       includeLatestPackageVersions: false,
     });
     configDefault.orgNames.should.be.an("array");
-    configDefault.should.have.property("excludedRepos");
+    configDefault.excludedRepos.should.be.an("array");
   });
 });

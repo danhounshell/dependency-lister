@@ -6,6 +6,7 @@ module.exports = {
     // bots
     // old stuff
   ],
+  outputPath: "dependencies.json",
   includePublic: true,
   includePrivate: true,
   includeArchived: false,

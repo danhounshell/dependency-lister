@@ -29,6 +29,7 @@ Fetches `package.json` files from every repository in one or more GitHub organiz
      "orgNames": ["YourOrg"],
      "githubToken": "your github token goes here",
      "excludedRepos": [],
+     "outputPath": "dependencies.json",
      "includePublic": true,
      "includePrivate": true,
      "includeArchived": false,
@@ -45,7 +46,7 @@ Fetches `package.json` files from every repository in one or more GitHub organiz
 npm start
 ```
 
-The output is written to `dependencies.json` in the project root.
+The output is written to the path specified in `outputPath` in the project root configuration file.
 
 ## Scripts
 
@@ -61,7 +62,7 @@ The output is written to `dependencies.json` in the project root.
 
 ## Output format
 
-Outputs `dependencies.json` file with a format like:
+Outputs json format to the path specified in `outputPath` in the project root configuration file with a format like:
 
 ```
 {

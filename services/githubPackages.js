@@ -72,14 +72,10 @@ module.exports = function createGithubPackagesService(config) {
   }
 
   async function fetchAllPackageJsons(octokit, orgNames = config.orgNames) {
-    const allPackageJsons = [];
-
-    for (const orgName of orgNames) {
-      const orgResults = await fetchOrgPackageJsons(octokit, orgName);
-      allPackageJsons.push(...orgResults);
-    }
-
-    return allPackageJsons;
+    const results = await Promise.all(
+      orgNames.map((orgName) => fetchOrgPackageJsons(octokit, orgName))
+    );
+    return results.flat();
   }
 
   return {

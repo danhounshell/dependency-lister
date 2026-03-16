@@ -4,6 +4,16 @@ const proxyquire = require("proxyquire").noCallThru();
 
 chai.should();
 
+let consoleWarnStub;
+
+beforeEach(() => {
+  consoleWarnStub = sinon.stub(console, "warn");
+});
+
+afterEach(() => {
+  sinon.restore();
+});
+
 describe("services/dependencyAggregation", () => {
   function createService(
     configOverride = {},
@@ -66,6 +76,75 @@ describe("services/dependencyAggregation", () => {
         "3.1.0": ["@orga/repo1"],
       },
     });
+  });
+
+  it("handles packageJson with no dependencies or devDependencies fields", () => {
+    const { service } = createService();
+
+    const result = service.aggregateDependencyUsage([
+      {
+        orgName: "OrgA",
+        repoName: "repo1",
+        packageJson: {},
+      },
+    ]);
+
+    result.should.deep.equal({});
+  });
+
+  it("deduplicates repos when same package appears in dependencies and devDependencies", () => {
+    const { service } = createService();
+
+    const result = service.aggregateDependencyUsage([
+      {
+        orgName: "OrgA",
+        repoName: "repo1",
+        packageJson: {
+          dependencies: { shared: "1.0.0" },
+          devDependencies: { shared: "1.0.0" },
+        },
+      },
+    ]);
+
+    result.shared["1.0.0"].should.deep.equal(["@orga/repo1"]);
+  });
+
+  it("records both versions when same package has different versions in dependencies and devDependencies", () => {
+    const { service } = createService();
+
+    const result = service.aggregateDependencyUsage([
+      {
+        orgName: "OrgA",
+        repoName: "repo1",
+        packageJson: {
+          dependencies: { pkg: "1.0.0" },
+          devDependencies: { pkg: "2.0.0" },
+        },
+      },
+    ]);
+
+    result.pkg.should.have.property("1.0.0");
+    result.pkg.should.have.property("2.0.0");
+  });
+
+  it("skips and warns for unrecognized version specifiers", () => {
+    const { service } = createService();
+
+    const result = service.aggregateDependencyUsage([
+      {
+        orgName: "OrgA",
+        repoName: "repo1",
+        packageJson: {
+          dependencies: { valid: "^1.0.0", ws: "workspace:*" },
+          devDependencies: {},
+        },
+      },
+    ]);
+
+    result.should.have.property("valid");
+    result.should.not.have.property("ws");
+    consoleWarnStub.calledOnce.should.equal(true);
+    consoleWarnStub.firstCall.args[0].should.include("workspace:*");
   });
 
   it("builds output with latest versions when enabled", async () => {

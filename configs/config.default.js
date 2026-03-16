@@ -1,8 +1,9 @@
 module.exports = {
-  name: "dependency-manager",
+  name: "dependency-lister",
   orgNames: [],
   githubToken: "",
-  excludedRepos: "",
+  excludedRepos: [],
+  outputPath: "dependencies.json",
   includePublic: true,
   includePrivate: true,
   includeArchived: false,

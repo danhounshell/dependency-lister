@@ -7,6 +7,11 @@ const dependencyAggregationService = require("./services/dependencyAggregation")
 const summaryService = require("./services/summary")(config, dependencyAggregationService);
 
 async function run() {
+  if (!Array.isArray(config.orgNames)) {
+    console.log("orgNames must be an array in config. Please check your config file.");
+    return;
+  }
+
   if (config.orgNames.length === 0) {
     console.log(
       "No organization names provided in config. Please add org names to the config file."
@@ -30,7 +35,7 @@ async function run() {
       dependencyAggregationService.aggregateDependencyUsage(allPackageJsonResults);
     const output = await dependencyAggregationService.buildDependencyOutput(allDependencies);
 
-    fs.writeFileSync("dependencies.json", JSON.stringify(output, null, 2));
+    fs.writeFileSync(config.outputPath, JSON.stringify(output, null, 2));
 
     summaryService.printSummary(
       allPackageJsonResults.length,

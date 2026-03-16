@@ -24,6 +24,7 @@ describe("index", () => {
     const config = {
       orgNames: ["OrgA"],
       githubToken: "token-123",
+      outputPath: "dependencies.json",
       ...configOverride,
     };
 
@@ -72,6 +73,17 @@ describe("index", () => {
       octokitInstance,
     };
   }
+
+  it("returns early when orgNames is not an array", async () => {
+    const { mod, stubs } = loadIndexWithStubs({ orgNames: "OrgA" });
+
+    await mod.run();
+
+    consoleLogStub
+      .calledWith("orgNames must be an array in config. Please check your config file.")
+      .should.equal(true);
+    stubs.Octokit.called.should.equal(false);
+  });
 
   it("returns early when orgNames is empty", async () => {
     const { mod, stubs } = loadIndexWithStubs({ orgNames: [] });
