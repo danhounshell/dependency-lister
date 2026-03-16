@@ -1,20 +1,65 @@
-Lists out all dependendencies for all repos in an Organization or multiple
-Can filter repos to public, private or both
-Can exlude archived or internal repos
+# dependency-lister
 
-example config.local.json
+Fetches `package.json` files from every repository in one or more GitHub organizations and aggregates all dependency versions into a single `dependencies.json` file. Optionally enriches each dependency with the latest published version for each major semver series.
 
+## Features
+
+- Scans all repos in one or more GitHub organizations
+- Aggregates both `dependencies` and `devDependencies`
+- Filters repos by visibility (public/private), archived status, and an explicit exclusion list
+- Optionally fetches the latest published version per major series from the npm registry
+
+## Requirements
+
+- Node.js >= 22
+- A GitHub personal access token with `repo` (or `read:org`) scope
+
+## Setup
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Create a `config.local.json` in the project root (this file is git-ignored):
+
+   ```json
+   {
+     "orgNames": ["YourOrg"],
+     "githubToken": "your github token goes here",
+     "excludedRepos": [],
+     "includePublic": true,
+     "includePrivate": true,
+     "includeArchived": false,
+     "includeInternal": false,
+     "includeLatestPackageVersions": false
+   }
+   ```
+
+   See `example.config.local.js` for a full annotated example.
+
+## Usage
+
+```bash
+npm start
 ```
-{
-	"orgNames": [ "YourOrg" ],
-	"githubToken": "your github token goes here",
-	"excludedRepos": [],
-	"includePublic": true,
-	"includePrivate": true,
-	"includeArchived": false,
-	"includeInternal": false
-}
-```
+
+The output is written to `dependencies.json` in the project root.
+
+## Scripts
+
+| Script                 | Description                              |
+| ---------------------- | ---------------------------------------- |
+| `npm start`            | Run the dependency lister                |
+| `npm test`             | Lint + unit tests with coverage          |
+| `npm run test:unit`    | Unit tests with c8 coverage only         |
+| `npm run lint`         | Run ESLint                               |
+| `npm run lint:fix`     | Run ESLint and auto-fix issues           |
+| `npm run format`       | Format all files with Prettier           |
+| `npm run format:check` | Check formatting without writing changes |
+
+## Output format
 
 Outputs `dependencies.json` file with a format like:
 
